@@ -16,39 +16,31 @@
                   </nav>
                 
             </div>
-            <div class="row align-items-start" >
-                <form class="form-inline">
+            <div class="row align-items-start mx-auto" >
+                <form class="form-horizontal" role="form">
+                    <div class="alert alert-success">
+                        输入4张扑克牌的点数：如2 3 5 8
+                      </div>
                     <div class="form-group row">
-                        <label class="col-4 col-form-label">4张扑克牌</label>
-                        <div class="col-8">
+                        <label class="col-5">4张扑克牌</label>
+                        <div class="col">
                             <input type="text" v-model="cards" class="form-control" id="cards" value="">
                         </div>
-                        <div>
-                           <!--  <button type="submit" class="btn btn-primary" v-on:click="calc()">计算</button> -->
-                        </div>
-                        
                     </div>
-                    
-                </form>
-
-            </div>
-
-            <div class="row align-items-start" >
-                <form class="form-inline">
                     <div class="form-group row">
-                        <label class="col-4 col-form-label">结果</label>
-                        <div class="col-8">
+                        <label class="col-5">结果</label>
+                        <div class="col">
                             <input type="text" v-model="result" class="form-control">
                         </div>
-                        <div>
-                           <!--  <button type="submit" class="btn btn-primary" v-on:click="calc()">计算</button> -->
-                        </div>
                         
                     </div>
+                    
                     
                 </form>
 
             </div>
+
+    
 
             
         </div>
@@ -140,6 +132,8 @@
                 var out = "";
                 var ret = "";
                 var i = 0;
+                var left;
+                
                 var x;
                 for (i=0; i<array.length; i++) {
                     x = array[i];
