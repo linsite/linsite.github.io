@@ -63,8 +63,8 @@
                         console.log(find([8, 2, 3, 5], 24));
                     },
                     cardsUpdated: function(newVal, oldVal) {
-                        console.log("new: " + newVal + " old: " + oldVal);
-                        var array = newVal.split(" ");
+                        var stripped = newVal.trim();
+                        var array = stripped.split(" ");
                         var args=[];
                         if (array.length == 4) {
                             for (i = 0; i < 4; i++) {
@@ -80,6 +80,8 @@
                             } else {
                                 app.result = "没有找到";
                             }
+                        } else {
+                            console.log("len: " + array.length)
                         }
                     }
                 }
