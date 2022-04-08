@@ -462,7 +462,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-04-05 22:37:51" itemprop="dateModified" datetime="2022-04-05T22:37:51+08:00">2022-04-05</time>
+      <time title="修改时间：2022-04-08 21:52:12" itemprop="dateModified" datetime="2022-04-08T21:52:12+08:00">2022-04-08</time>
     </span>
 
   
@@ -479,56 +479,14 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">文件系统是负责如何在硬盘上存贮、管理数据的。</span><br></pre></td></tr></table></figure>
 <p>这里的管理，包括删除，新建，目录及文件。</p>
 <h1 id="0x02-必要的背景"><a href="#0x02-必要的背景" class="headerlink" title="0x02 必要的背景"></a>0x02 必要的背景</h1><p>我个人觉得去理解技术发展的历史，一定程度上可以辅助理解一些技术的细节，而且这些技术对于现在的我们来说可能<br>过于复杂，如果我们从计算机历史追溯的话，发现有些发展是趋势所致，理所当然。比如，加载器和连接器的技术发展过程。<br>就是因为从手工（打孔卡片）输入计算机指令操作中，遇到的指令<br>修改操作时，手工修改指令的地址极其繁琐，才慢慢出现了机器自动重定位，进而演变出现在的加载器和定位器。<br>插入一句相对无关的话，在现代操作系统技术成熟之前，其他基础技术，在西方计算机工业中已经很成熟了，这些已经成熟的技术中就包含有文件系统技术。<br>文件系统的背景介绍同时依赖，块设备，下面介绍下块设备。</p>
-<h2 id="2-1-块设备"><a href="#2-1-块设备" class="headerlink" title="2.1 块设备"></a>2.1 块设备</h2><p>块设备属于一种存贮设备，支持按块存取数据。以前流行的软件，现在的机械硬盘，固态硬盘，USB移动U盘都属于块设备。<br>以目前的技术水平来说，软盘的容量相对硬盘要小的多，它的块大小是512Byte，现在主要硬盘块大小都是1024Byte。<br>块设备只提供了一个存贮空间，就如同图书馆里的空房子一样，可以用来存放书（数据），你想怎么存都可以，<br>你可以分出一些小区域（分区），也可以放一些书架（目录）。怎么存放与管理书，就像是文件系统对于块设备一样。<br>块设备为存贮和管理大量数据提供了可能。</p>
-<h2 id="2-2-文件系统的历史"><a href="#2-2-文件系统的历史" class="headerlink" title="2.2 文件系统的历史"></a>2.2 文件系统的历史</h2><p>油管上Crash Cource of Computor Science里面详细介绍了文件系统的历史。感兴趣的可以看下，这里我只简要介绍下。<br>出现块设备以后，人们开始用它来存数据了， 这个时候还没有文件系统。</p>
-<ul>
-<li>1 将数据转化二进制</li>
-<li>2 通过串口写入块设备</li>
-<li>3 需要的时候，从块设备取出。  </li>
-<li>4 在块设备上加一个标签，说明这里存放了什么数据，是谁在用的<br>这样人们发现，一个块设备只能存贮一个文件。而且很难确切知道，这个块设备还有多少空间没有用。<br>文件系统就应运而生了。文件系统会使用一部分块设备的存贮空间，将块设备的存贮空间如何使用做了<br>详细的划分。总体上分为2块，元数据空间和数据空间。一块用来存贮关于数据空间使用情况的的信息，另外一部分用来存贮真正的数据。</li>
-<li>元数据：关于数据的信息，也叫关于数据的数据，metadata，是一个常见到的计算机专业词汇。</li>
-<li>数据：比如一个文件的内容，所有者，修改时间，大小。</li>
-</ul>
-<p>随着计算机技术的发展出现了许多文件系统格式，常见的有Linux下的extN,Windows下的FAT，NTFS，不同的文件格式适用的操作系统不同，<br>特点也不同。一个基本的规律是，文件系统支持的特性越多，就越复杂，这里我挑针对Linux开发的第一个文件系统Ext2来介绍，<br>因为它最简单，这个系列最新的Ext4非常庞大，暂不涉及了。</p>
-<h1 id="0x03-写文件"><a href="#0x03-写文件" class="headerlink" title="0x03 写文件"></a>0x03 写文件</h1><p>write(syscall)<br>    fdget_pos<br>    file_pos_read<br>    vfs_write<br>        rw_verify_area<br>        file_start_write:加锁<br>        __vfs_write<br>            new_sync_write<br>                call_write_iter<br>                    ext2_file_write_iter<br>                        generic_file_write_iter<br>                            __generic_file_write_iter<br>                                generic_file_direct_write<br>                                    filemap_write_and_wait_range<br>                                    ext2_direct_IO<br>                                    blockdev_direct_IO<br>                                    __blockdev_direct_IO<br>                                    do_blockdev_direct_IO<br>                            generic_write_sync<br>        fsnotify_modify<br>        add_wchar<br>        inc_syscw<br>        file_end_write</p>
-<h1 id="0x04-加载文件系统"><a href="#0x04-加载文件系统" class="headerlink" title="0x04 加载文件系统"></a>0x04 加载文件系统</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -t ext2 -o loop a.hd /mnt</span><br></pre></td></tr></table></figure>
-<p>mount(syscall)<br>    do_mount<br>        do_new_mount<br>            vfs_kern_mount<br>                mount_fs<br>                    type-&gt;mount</p>
-<p>struct super_block *sb:VFS的超级块对象<br>struct ext2_sb_info *sbi: ext2的超级块描述对象。<br>struct ext2_super_block *es: ext2位于磁盘上的超级块。<br>ext2_fill_super:</p>
-<ol>
-<li>get_sb_block, 加载时用户可以指定sb的块位置，没有设置的，默认在第1个块上（从0开始）</li>
-<li>分配struct ext2_sb_info对象。</li>
-<li>分配一个block_group锁</li>
-<li>关联3个对象。将sbi挂到sp,将sb_block设置到的sbi。</li>
-<li>初始化sbi的锁成员</li>
-<li>确定块长度</li>
-<li>读取磁盘上的超级块</li>
-<li>将es关联上sbi的s_es成员</li>
-<li>设置加载选项</li>
-<li>检查功能项支持情况</li>
-<li>根据读取到超级块的信息，重新计算blocksize</li>
-<li>根据读到的信息设置sbi的成员</li>
-<li>计算块组数量：总可用的块数&#x2F;每个块组里的块数 + 1</li>
-<li>计算为保存块组描述符需要的内存大小：组数量 + 每块中的组描述符数量-1&#x2F;每块中组描述符数量</li>
-<li>为每个组描述符分配了一个字节的s_debts</li>
-<li>1091-1101：从磁盘上读入每个组描述符块。</li>
-<li>1102-1105：检查各个组描述符是否合法</li>
-<li>1111-1123:初始化预留窗口RB的锁，和根节点</li>
-<li>1125-1138:各个PERCPU变量的初始化，涉及freeblock,freeinode, dir等计数</li>
-<li>1150-1152：赋值3个操作函数集合，超级块的操作函数，导出函数集合，xattr操作函数集合</li>
-<li>1160-1176：读取root inode，赋值到sb中（方便VFS从sb直接找到根结点的dentry）。</li>
-<li>1182：回写超级块</li>
-</ol>
-<p>ext2_iget(struct supber_block *sb, unsigned long ino):读取一个结点</p>
-<ol>
-<li>获取节点iget_locked<ol>
-<li>新生成的inode，没有数据，只有一个ino编号</li>
-</ol>
-</li>
-<li>调用ext2_get_inode获取到raw inode</li>
-<li>1417-1480：根据raw inode信息，设置inode和ei的属性</li>
-<li>1482-1520：根据inode的类型设置不同的操作函数集合。根目录的i_op为ext2_dir_inode_operations, i_fop为ext2_dir_operations, i_mapping-&gt;a_ops为ext2_aops</li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/10/10/linux-filesystem-learn1-md/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -949,7 +907,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-04-05 22:37:51" itemprop="dateModified" datetime="2022-04-05T22:37:51+08:00">2022-04-05</time>
+      <time title="修改时间：2022-04-08 21:53:27" itemprop="dateModified" datetime="2022-04-08T21:53:27+08:00">2022-04-08</time>
     </span>
 
   
@@ -965,25 +923,15 @@
           <h2 id="0x00-LVM介绍"><a href="#0x00-LVM介绍" class="headerlink" title="0x00 LVM介绍"></a>0x00 LVM介绍</h2><p>LVM是Linux中一个很有用的特性，可以动态地扩展磁盘逻辑分区的大小，而不会对磁盘上已有的数据造成影响。下面是整个操作的流程。</p>
 <h2 id="0x01-查看要添加的磁盘"><a href="#0x01-查看要添加的磁盘" class="headerlink" title="0x01 查看要添加的磁盘"></a>0x01 查看要添加的磁盘</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls /dev/sd*</span><br><span class="line">/dev/sda /dev/sda1 /dev/sda2 /dev/sdb /dev/sdb1 /dev/sdc</span><br></pre></td></tr></table></figure>
 <p>目标是sdc</p>
-<h2 id="0x02-对其进行分区"><a href="#0x02-对其进行分区" class="headerlink" title="0x02 对其进行分区"></a>0x02 对其进行分区</h2><p>使用CentOS中的命令fdis</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# fdisk /dev/sdc</span><br><span class="line">Device contains neither a valid DOS partition table, nor Sun, SGI or OSF disklabel</span><br><span class="line">Building a new DOS disklabel with disk identifier 0x9b098cfe.</span><br><span class="line">Changes will remain in memory only, until you decide to write them.</span><br><span class="line">After that, of course, the previous content won&#x27;t be recoverable.</span><br><span class="line"></span><br><span class="line">Warning: invalid flag 0x0000 of partition table 4 will be corrected by w(rite)</span><br><span class="line"></span><br><span class="line">WARNING: DOS-compatible mode is deprecated. It&#x27;s strongly recommended to</span><br><span class="line">         switch off the mode (command &#x27;c&#x27;) and change display units to</span><br><span class="line">         sectors (command &#x27;u&#x27;).</span><br><span class="line">&lt;!--more--&gt;</span><br><span class="line">Command (m for help): n</span><br><span class="line">Command action</span><br><span class="line">   e   extended</span><br><span class="line">   p   primary partition (1-4)</span><br><span class="line">p</span><br><span class="line">Partition number (1-4): 1</span><br><span class="line">First cylinder (1-522, default 1): </span><br><span class="line">Using default value 1</span><br><span class="line">Last cylinder, +cylinders or +size&#123;K,M,G&#125; (1-522, default 522): </span><br><span class="line">Using default value 522</span><br><span class="line"></span><br><span class="line">Command (m for help): t</span><br><span class="line">Selected partition 1</span><br><span class="line">Hex code (type L to list codes): 8e</span><br><span class="line">Changed system type of partition 1 to 8e (Linux LVM)</span><br><span class="line"></span><br><span class="line">Command (m for help): w</span><br><span class="line">The partition table has been altered!</span><br><span class="line"></span><br><span class="line">Calling ioctl() to re-read partition table.</span><br><span class="line">Syncing disks</span><br></pre></td></tr></table></figure>
-<h2 id="0x03-查看现有的逻辑卷组"><a href="#0x03-查看现有的逻辑卷组" class="headerlink" title="0x03 查看现有的逻辑卷组"></a>0x03 查看现有的逻辑卷组</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# vgs -a</span><br><span class="line">VG #PV #LV #SN Attr VSize VFree</span><br><span class="line">VolGroup 2 2 0 wz--n- 15.50g 2.00g</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# df -h</span><br><span class="line">Filesystem                    Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/VolGroup-lv_root   13G  727M   12G   6% /</span><br><span class="line">tmpfs                         499M     0  499M   0% /dev/shm</span><br><span class="line">/dev/sda1                     485M   32M  428M   7% /boot</span><br></pre></td></tr></table></figure>
-<p>现在有2个逻辑卷，目标是把&#x2F;dev&#x2F;mapper&#x2F;VolGroup-lv_root这个逻辑卷再增大一个&#x2F;dev&#x2F;sdc的空间。</p>
-<h2 id="0x04-创建物理卷"><a href="#0x04-创建物理卷" class="headerlink" title="0x04 创建物理卷"></a>0x04 创建物理卷</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# pvcreate /dev/sdc1</span><br><span class="line">  dev_is_mpath: failed to get device for 8:33</span><br><span class="line">  Physical volume &quot;/dev/sdc1&quot; successfully create</span><br></pre></td></tr></table></figure>
-<p>不知道为什么会有报错，但不影响。</p>
-<h2 id="0x05-添加物理卷到目标卷组"><a href="#0x05-添加物理卷到目标卷组" class="headerlink" title="0x05 添加物理卷到目标卷组"></a>0x05 添加物理卷到目标卷组</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# vgextend VolGroup /dev/sdc1</span><br><span class="line">  Volume group &quot;VolGroup&quot; successfully extended</span><br></pre></td></tr></table></figure>
-<h2 id="0x06-扩展目标逻辑卷"><a href="#0x06-扩展目标逻辑卷" class="headerlink" title="0x06 扩展目标逻辑卷"></a>0x06 扩展目标逻辑卷</h2><p>因为加的磁盘大小为4G，为了实验。所以扩展空间也是4G</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# lvextend -L +4G /dev/VolGroup/lv_root </span><br><span class="line">  Extending logical volume lv_root to 16.71 GiB</span><br><span class="line">  Logical volume lv_root successfully resized</span><br></pre></td></tr></table></figure>
-<h2 id="0x07-增长文件系统"><a href="#0x07-增长文件系统" class="headerlink" title="0x07 增长文件系统"></a>0x07 增长文件系统</h2><p>如果分区的FS类型为ext系的话，使用的命令是resize2fs, 如果是xfs的话，使用的命令是xfs_growfs</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# resize2fs /dev/VolGroup/lv_root </span><br><span class="line">resize2fs 1.41.12 (17-May-2010)</span><br><span class="line">Filesystem at /dev/VolGroup/lv_root is mounted on /; on-line resizing required</span><br><span class="line">old desc_blocks = 1, new_desc_blocks = 2</span><br><span class="line">Performing an on-line resize of /dev/VolGroup/lv_root to 4380672 (4k) blocks.</span><br><span class="line">The filesystem on /dev/VolGroup/lv_root is now 4380672 blocks long.</span><br></pre></td></tr></table></figure>
-<p>再次查看df</p>
-<pre><code>[root@localhost ~]# df -h
-Filesystem                    Size  Used Avail Use% Mounted on
-/dev/mapper/VolGroup-lv_root   17G  728M   15G   5% /
-tmpfs                         499M     0  499M   0% /dev/shm
-/dev/sda1                     485M   32M  428M   7% /boot
-</code></pre>
-
+<h2 id="0x02-对其进行分区"><a href="#0x02-对其进行分区" class="headerlink" title="0x02 对其进行分区"></a>0x02 对其进行分区</h2><p>使用CentOS中的命令fdisk</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/06/26/lvm_learning/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 

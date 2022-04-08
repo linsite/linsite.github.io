@@ -28,7 +28,7 @@
 <meta property="og:description" content="0x01 简介这是学习操作系统中，针对Linux文件系统学习的一些总结。文件系统作为操作系统的一个基础组件之一，承担了与硬盘交互，数据的持久化实现。其重要性不言而喻。这里我以ext2文件系统代码为样本，一步步探索文件系统的实现与原理。下面是我理解的文件系统。   1文件系统是负责如何在硬盘上存贮、管理数据的。 这里的管理，包括删除，新建，目录及文件。 0x02 必要的背景我个人觉得去理解技术发展的">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2018-10-10T00:27:52.000Z">
-<meta property="article:modified_time" content="2022-04-05T14:37:51.322Z">
+<meta property="article:modified_time" content="2022-04-08T13:52:12.040Z">
 <meta property="article:author" content="Quay &amp; LinLin">
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="内核">
@@ -210,7 +210,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-04-05 22:37:51" itemprop="dateModified" datetime="2022-04-05T22:37:51+08:00">2022-04-05</time>
+      <time title="修改时间：2022-04-08 21:52:12" itemprop="dateModified" datetime="2022-04-08T21:52:12+08:00">2022-04-08</time>
     </span>
 
   
@@ -227,6 +227,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">文件系统是负责如何在硬盘上存贮、管理数据的。</span><br></pre></td></tr></table></figure>
 <p>这里的管理，包括删除，新建，目录及文件。</p>
 <h1 id="0x02-必要的背景"><a href="#0x02-必要的背景" class="headerlink" title="0x02 必要的背景"></a>0x02 必要的背景</h1><p>我个人觉得去理解技术发展的历史，一定程度上可以辅助理解一些技术的细节，而且这些技术对于现在的我们来说可能<br>过于复杂，如果我们从计算机历史追溯的话，发现有些发展是趋势所致，理所当然。比如，加载器和连接器的技术发展过程。<br>就是因为从手工（打孔卡片）输入计算机指令操作中，遇到的指令<br>修改操作时，手工修改指令的地址极其繁琐，才慢慢出现了机器自动重定位，进而演变出现在的加载器和定位器。<br>插入一句相对无关的话，在现代操作系统技术成熟之前，其他基础技术，在西方计算机工业中已经很成熟了，这些已经成熟的技术中就包含有文件系统技术。<br>文件系统的背景介绍同时依赖，块设备，下面介绍下块设备。</p>
+<span id="more"></span>
 <h2 id="2-1-块设备"><a href="#2-1-块设备" class="headerlink" title="2.1 块设备"></a>2.1 块设备</h2><p>块设备属于一种存贮设备，支持按块存取数据。以前流行的软件，现在的机械硬盘，固态硬盘，USB移动U盘都属于块设备。<br>以目前的技术水平来说，软盘的容量相对硬盘要小的多，它的块大小是512Byte，现在主要硬盘块大小都是1024Byte。<br>块设备只提供了一个存贮空间，就如同图书馆里的空房子一样，可以用来存放书（数据），你想怎么存都可以，<br>你可以分出一些小区域（分区），也可以放一些书架（目录）。怎么存放与管理书，就像是文件系统对于块设备一样。<br>块设备为存贮和管理大量数据提供了可能。</p>
 <h2 id="2-2-文件系统的历史"><a href="#2-2-文件系统的历史" class="headerlink" title="2.2 文件系统的历史"></a>2.2 文件系统的历史</h2><p>油管上Crash Cource of Computor Science里面详细介绍了文件系统的历史。感兴趣的可以看下，这里我只简要介绍下。<br>出现块设备以后，人们开始用它来存数据了， 这个时候还没有文件系统。</p>
 <ul>
