@@ -116,7 +116,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -127,7 +127,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -156,6 +156,91 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2017/12/13/phantomjs-sso-login/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Quay & LinLin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Quay & LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Quay & LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2017/12/13/phantomjs-sso-login/" class="post-title-link" itemprop="url">PhantomJS SSO单点登录，加Cookie异常情况处理</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-12-13 15:37:49" itemprop="dateCreated datePublished" datetime="2017-12-13T15:37:49+08:00">2017-12-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-04-05 22:37:51" itemprop="dateModified" datetime="2022-04-05T22:37:51+08:00">2022-04-05</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h1><h2 id="PhantomJS加Cookie的流程"><a href="#PhantomJS加Cookie的流程" class="headerlink" title="PhantomJS加Cookie的流程"></a>PhantomJS加Cookie的流程</h2><ul>
+<li>加载一个页面<br>一般会选择目的页面。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">driver.get(url)</span><br></pre></td></tr></table></figure></li>
+<li>加载Cookie<br>Cookie一般以分号分割。按照规范RFC2109规定，一个Cookie条目，有name,value,domain,secure,expires,pathcomment其中name与value是成对出现的，也是可以直接看到的属性。<br>domain限定了cookie的作用范围，请求的域名不在此范围内时，浏览器不会发送Cookie。secure是一个可选项，没有值，用来标识此Cookie是否经过HTTPS发送。expires指定的是过期时间，path是Cookie的有效路径。comment是可选项，用来向客户端传递人眼可读信息。<br>单点登录时，可能会跳转到登录页面，登录页面如果与当前页面不共域的时候，使用目的域是无法登录的。<br>按照这些要求添加好Cookie。调用<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">driver.add_cookie(cookie)</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/12/13/phantomjs-sso-login/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -914,112 +999,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2017/05/25/box-model-in-css/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2017/04/03/flexbox-in-css/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Quay & LinLin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Quay & LinLin's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Quay & LinLin's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2017/04/03/flexbox-in-css/" class="post-title-link" itemprop="url">CSS中的弹性布局(Flexbox)</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2017-04-03 17:47:45" itemprop="dateCreated datePublished" datetime="2017-04-03T17:47:45+08:00">2017-04-03</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-04-05 22:37:51" itemprop="dateModified" datetime="2022-04-05T22:37:51+08:00">2022-04-05</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/CSS%E5%B8%83%E5%B1%80/" itemprop="url" rel="index"><span itemprop="name">CSS布局</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/CSS%E5%B8%83%E5%B1%80/%E7%BF%BB%E8%AF%91/" itemprop="url" rel="index"><span itemprop="name">翻译</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>允许你使用CSS3 Flexbox功能的CSS属性<br>原文链接：<a target="_blank" rel="noopener" href="http://cssreference.io/flexbox/">http://cssreference.io/flexbox/</a></p>
-<h1 id="align-content（flex-container属性）"><a href="#align-content（flex-container属性）" class="headerlink" title="align-content（flex container属性）"></a>align-content（flex container属性）</h1><p>定义每个行在flexbox容器(flexbox container)中的对齐方式。 它仅适用于 <em><strong>flex-wrap: wrap</strong></em> 存在的情况下，并且如果有多行的flexbox项目(flexbox item)。</p>
-<h2 id="align-content-stretch-x2F-x2F-默认值"><a href="#align-content-stretch-x2F-x2F-默认值" class="headerlink" title="align-content: stretch;&#x2F;&#x2F;默认值"></a>align-content: stretch;&#x2F;&#x2F;默认值</h2><p>每行将拉伸以填充剩余空间。<br>在这种情况下，容器的高度为300px。 所有盒子都是50px高，除了第二个是100px高。</p>
-<ul>
-<li>第一行是100px高</li>
-<li>第二行是50px高</li>
-<li>剩余空间为150像素<br>该剩余空间在两行之间平均分布：</li>
-<li>第一行现在是175px高</li>
-<li>第二行现在是125px高</li>
-</ul>
-<p>![align-content: stretch;](&#x2F;images&#x2F;align-content: stretch;.png)</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2017/04/03/flexbox-in-css/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
