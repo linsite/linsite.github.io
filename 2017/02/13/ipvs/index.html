@@ -24,12 +24,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="LVS配置命令理解1">
 <meta property="og:url" content="https://blog.tkfun.site/2017/02/13/ipvs/index.html">
-<meta property="og:site_name" content="Quay &amp; LinLin&#39;s blog">
+<meta property="og:site_name" content="LinLin&#39;s blog">
 <meta property="og:description" content="LVS配置命令理解1上周末对照着Ubuntu LVS配置 的教程初步熟悉了ubuntu下LVS的配置过程中。这对于想掌握其原理的人来说是不够的。配置的命令有以下几条： ifconfig来为当前的网卡配置虚拟IP。其中同样通过在CSDN上搜索，可以知道，通过在eth0（网卡接口名称）后加“:n”，其中n为N+（正整数），就可以为网卡配置多个虚拟IP地址。这样的IP地址是不会有真实的数据经过它。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2017-02-13T14:52:10.000Z">
-<meta property="article:modified_time" content="2022-04-05T14:37:51.321Z">
-<meta property="article:author" content="Quay &amp; LinLin">
+<meta property="article:modified_time" content="2023-01-28T23:59:57.864Z">
+<meta property="article:author" content="LinLin">
 <meta property="article:tag" content="LVS">
 <meta property="article:tag" content="服务器配置">
 <meta name="twitter:card" content="summary">
@@ -42,7 +42,7 @@
 <script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.tkfun.site/2017/02/13/ipvs/","path":"2017/02/13/ipvs/","title":"LVS配置命令理解1"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>LVS配置命令理解1 | Quay & LinLin's blog</title>
+<title>LVS配置命令理解1 | LinLin's blog</title>
   
 
 
@@ -69,7 +69,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <p class="site-title">Quay & LinLin's blog</p>
+      <p class="site-title">LinLin's blog</p>
       <i class="logo-line"></i>
     </a>
   </div>
@@ -116,25 +116,25 @@
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Quay & LinLin</p>
+  <p class="site-author-name" itemprop="name">LinLin</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap site-overview-item animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-count">34</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -177,16 +177,16 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Quay & LinLin">
+      <meta itemprop="name" content="LinLin">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Quay & LinLin's blog">
+      <meta itemprop="name" content="LinLin's blog">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="LVS配置命令理解1 | Quay & LinLin's blog">
+      <meta itemprop="name" content="LVS配置命令理解1 | LinLin's blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
@@ -209,7 +209,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-04-05 22:37:51" itemprop="dateModified" datetime="2022-04-05T22:37:51+08:00">2022-04-05</time>
+      <time title="修改时间：2023-01-29 07:59:57" itemprop="dateModified" datetime="2023-01-29T07:59:57+08:00">2023-01-29</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -263,8 +263,8 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2017/01/31/positioning-in-css/" rel="prev" title="CSS中的定位（position）">
-                  <i class="fa fa-chevron-left"></i> CSS中的定位（position）
+                <a href="/2016/12/22/crc-algo-trans7-note/" rel="prev" title="轻松理解CRC差错检测算法七-注解">
+                  <i class="fa fa-chevron-left"></i> 轻松理解CRC差错检测算法七-注解
                 </a>
             </div>
             <div class="post-nav-item">
@@ -292,11 +292,11 @@
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">Quay & LinLin</span>
+  <span class="author" itemprop="copyrightHolder">LinLin</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
