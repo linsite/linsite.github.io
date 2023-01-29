@@ -116,7 +116,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -127,7 +127,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-count">37</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -156,6 +156,84 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2023/01/29/2023-01-raspberry-2b-realtek-8188gu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LinLin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/01/29/2023-01-raspberry-2b-realtek-8188gu/" class="post-title-link" itemprop="url">树莓派2B安装Realtek 8188GU 无线网卡驱动</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-01-29 17:47:50 / 修改时间：18:52:51" itemprop="dateCreated datePublished" datetime="2023-01-29T17:47:50+08:00">2023-01-29</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <span id="more"></span>
+
+<p>旧的树莓派想重新安装下系统，不小心买了一个8188GU的网卡，结果找了一圈，没 Linux 主线的驱动。在网上找了一波，找到了这个，<a target="_blank" rel="noopener" href="https://github.com/McMCCRU/rtl8188gu">https://github.com/McMCCRU/rtl8188gu</a>，看起来风评还不错。试了下，最终因为CPU资源占用高没用，把这个网卡退了，没有精力去研究驱动的问题。这里记录下编译使用过程的问题，希望能帮到需要的同学。</p>
+<p>主要有以下3个问题：</p>
+<ol>
+<li>最新的 raspbian 内核为<code>Linux version 5.15.84-v7+</code>，想编译驱动，需要找对应的源码，官方apt仓库中还没有。需要去github上下载，<a target="_blank" rel="noopener" href="https://github.com/raspberrypi/linux">https://github.com/raspberrypi/linux</a>。教程见<a target="_blank" rel="noopener" href="https://forums.raspberrypi.com/viewtopic.php?t=342491">https://forums.raspberrypi.com/viewtopic.php?t=342491</a>。</li>
+<li>编译时出错提示 “No rule to make target ‘scripts&#x2F;module.lds”。原因是没有在源码中执行<code>make modules_prepare</code>。</li>
+<li>安装好驱动，成功连上了 Wifi。但有个问题，有个内核线程”RTW_CMD_THREAD”，一直在跑，占了快一个核心，这我接受不了。所以还是退了吧。</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -965,92 +1043,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2018/08/10/2018-8-os1/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2018/06/26/lvm_learning/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="LinLin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="LinLin's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | LinLin's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/06/26/lvm_learning/" class="post-title-link" itemprop="url">Linux动态扩展LVM分区</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2018-06-26 21:19:00" itemprop="dateCreated datePublished" datetime="2018-06-26T21:19:00+08:00">2018-06-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-01-29 07:59:57" itemprop="dateModified" datetime="2023-01-29T07:59:57+08:00">2023-01-29</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="0x00-LVM介绍"><a href="#0x00-LVM介绍" class="headerlink" title="0x00 LVM介绍"></a>0x00 LVM介绍</h2><p>LVM是Linux中一个很有用的特性，可以动态地扩展磁盘逻辑分区的大小，而不会对磁盘上已有的数据造成影响。下面是整个操作的流程。</p>
-<h2 id="0x01-查看要添加的磁盘"><a href="#0x01-查看要添加的磁盘" class="headerlink" title="0x01 查看要添加的磁盘"></a>0x01 查看要添加的磁盘</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls /dev/sd*</span><br><span class="line">/dev/sda /dev/sda1 /dev/sda2 /dev/sdb /dev/sdb1 /dev/sdc</span><br></pre></td></tr></table></figure>
-<p>目标是sdc</p>
-<h2 id="0x02-对其进行分区"><a href="#0x02-对其进行分区" class="headerlink" title="0x02 对其进行分区"></a>0x02 对其进行分区</h2><p>使用CentOS中的命令fdisk</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/06/26/lvm_learning/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
