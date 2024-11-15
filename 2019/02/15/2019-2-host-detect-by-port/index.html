@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.tkfun.site","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="网络资产探测中主机发现的实现方案分析。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="主机发现方案">
+<meta property="og:url" content="https://blog.tkfun.site/2019/02/15/2019-2-host-detect-by-port/index.html">
+<meta property="og:site_name" content="LinLin&#39;s blog">
+<meta property="og:description" content="网络资产探测中主机发现的实现方案分析。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-02-15T03:24:25.000Z">
+<meta property="article:modified_time" content="2024-11-15T11:58:41.867Z">
+<meta property="article:author" content="LinLin">
+<meta property="article:tag" content="网络资产">
+<meta property="article:tag" content="主机存活探测">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://blog.tkfun.site/2019/02/15/2019-2-host-detect-by-port/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.tkfun.site/2019/02/15/2019-2-host-detect-by-port/","path":"2019/02/15/2019-2-host-detect-by-port/","title":"主机发现方案"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>主机发现方案 | LinLin's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">LinLin's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">0x00 介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-ping"><span class="nav-number">2.</span> <span class="nav-text">0x01 ping</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">3.</span> <span class="nav-text">0x02 端口扫描</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#No-route-to-host%E6%83%85%E5%86%B5"><span class="nav-number">3.1.</span> <span class="nav-text">No route to host情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#timed-out%E6%83%85%E5%86%B5"><span class="nav-number">3.2.</span> <span class="nav-text">timed out情况</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-%E4%B8%BB%E6%9C%BA%E5%8F%91%E7%8E%B0%E6%96%B9%E6%A1%88"><span class="nav-number">4.</span> <span class="nav-text">0x03 主机发现方案</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LinLin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2019/02/15/2019-2-host-detect-by-port/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LinLin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="主机发现方案 | LinLin's blog">
+      <meta itemprop="description" content="网络资产探测中主机发现的实现方案分析。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          主机发现方案
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-02-15 11:24:25" itemprop="dateCreated datePublished" datetime="2019-02-15T11:24:25+08:00">2019-02-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 19:58:41" itemprop="dateModified" datetime="2024-11-15T19:58:41+08:00">2024-11-15</time>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">网络资产探测中主机发现的实现方案分析。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="0x00-介绍"><a href="#0x00-介绍" class="headerlink" title="0x00 介绍"></a>0x00 介绍</h1><p>网络资产梳理中，最重要的一项是主机发现。主机发现就是通过一些技术手段，来侦察网络中一些主机是否存活。主机发现又分为主动发现和被动发现两大类。</p>
+<ul>
+<li>主动发现：主动进行侦察探测，如端口探测</li>
+<li>被动发现：被动接收一些信息来进行判断，如流量监听</li>
+</ul>
+<p>主动发现单个主机存活的手段有</p>
+<ul>
+<li>ping</li>
+<li>端口扫描</li>
+</ul>
+<p>当然不是所有的存活主机都可以通过主动手段发现。存在一种极端情形，如果一个存活主机没有开放任务端口&#x2F;服务，同时又禁止了ICMP应答，同时启用iptables防火墙所有的端口都不接收连接，这种情况下以上的两种手段都是无法发现</p>
+<span id="more"></span>
+<h1 id="0x01-ping"><a href="#0x01-ping" class="headerlink" title="0x01 ping"></a>0x01 ping</h1><p>简单来说，如果能ping通的话，这个主机就是存活的。但否命题是不成立的，如果ping不通一个主机的话，并不能说明这个主机就是不存活的。主机管理上有一些手段，可以禁止ICMP应答。如下命令可以关闭ICMP应答，则此主机不能被ping通，但它是存活的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl net.ipv4.icmp_echo_ignore_all=1</span><br></pre></td></tr></table></figure>
+
+<h1 id="0x02-端口扫描"><a href="#0x02-端口扫描" class="headerlink" title="0x02 端口扫描"></a>0x02 端口扫描</h1><p>相对ping而言，端口扫描更可靠和全面。端口扫描，就是对目标的一些端口发起TCP连接，或者类似TCP连接的动作，通过判断目标的响应，来判断目标是否存活。<br>就单个端口而言，判定的逻辑如下表</p>
+<table>
+<thead>
+<tr>
+<th>响应情况</th>
+<th>主机是否存活</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>连接成功</td>
+<td>主机存活</td>
+</tr>
+<tr>
+<td>timed out</td>
+<td>不能判定是否存活</td>
+</tr>
+<tr>
+<td>Connection refused</td>
+<td>主机存活</td>
+</tr>
+<tr>
+<td>No route to host</td>
+<td>部分情况可判定不存活</td>
+</tr>
+</tbody></table>
+<p>如果想通过端口扫描发现主机时，想提高主机发现的效果，则需要提高端口扫描的数量。甚至是扫描全部的可能端口(1-65535)。</p>
+<h2 id="No-route-to-host情况"><a href="#No-route-to-host情况" class="headerlink" title="No route to host情况"></a>No route to host情况</h2><p>这种提示是指找不到主机路由。一般来说，可以直接判断主机不存活的，实际测试中发现了在虚拟机中存在一些异常。</p>
+<table>
+<thead>
+<tr>
+<th>虚拟机方案</th>
+<th>不存活端口的响应</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>KVM&#x2F;virt-manager</td>
+<td>异常No route to host</td>
+</tr>
+<tr>
+<td>VirtualBox</td>
+<td>异常No route to host</td>
+</tr>
+<tr>
+<td>VMware</td>
+<td>正常</td>
+</tr>
+</tbody></table>
+<p>所以此响应不能作为主机是否存活的充分条件。</p>
+<h2 id="timed-out情况"><a href="#timed-out情况" class="headerlink" title="timed out情况"></a>timed out情况</h2><p>timed out是指在发起TCP连接时，连接超时了。这种情况下，一般是目标启用了防火墙。正常情况下，如果一个主机存活，而且端口未开放时，连接时，对方会响应Connection refused。如下在Linux操作系统中，下面的命令会对81端口添加过滤规则，所有的连接尝试都会被DROP掉，造成连接方TCP连接超时。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t filter -A INPUT -p tcp --dport 81 -j DROP</span><br></pre></td></tr></table></figure>
+<p>这种情况下，如果出现在一个局域网内，一般也可以判断这个主机是存活的。因为如果不存活，会响应No route to host，提示找不到路由。但在测试中也会出现异常，一个主机不存活，但进行端口连接时也超时了。<br>所以这种情况下不能给出主机是否存活的判断。</p>
+<h1 id="0x03-主机发现方案"><a href="#0x03-主机发现方案" class="headerlink" title="0x03 主机发现方案"></a>0x03 主机发现方案</h1><p>根据前面分析的结果，设计了一个合理的主机发现方案如下。</p>
+<ol>
+<li>对主机进行ping扫描，留下不能ping通的主机</li>
+<li>对不能ping通的主机进行1到3个端口扫描</li>
+<li>如果响应中有Connect refused&#x2F;connected，判定主机存活，余下的主机进行第4步判断。</li>
+<li>对于timeout和No route to host的，加大端口扫描范围，端口数量超出限制时，或者有连接成功的端口时，停止扫描。</li>
+</ol>
+<p>第4步中，主机的发现效果和扫描的最大端口数量相关，可能需要用户设置期望的值。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" rel="tag"># 网络资产</a>
+              <a href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" rel="tag"># 主机存活探测</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/10/10/linux-filesystem-learn1-md/" rel="prev" title="Linux文件系统学习1">
+                  <i class="fa fa-angle-left"></i> Linux文件系统学习1
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/08/2022-04-08-go-chan-nonblock/" rel="next" title="Go非阻塞通道探究">
+                  Go非阻塞通道探究 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">LinLin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"linsite","repo":"blog","client_id":"c890ddee7bf63b258874","client_secret":"0569d1d63cbc2d139920a15bc963f2ec46371e22","admin_user":"linsite","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","id":"location.pathname","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.js","integrity":"sha256-MVK9MGD/XJaGyIghSVrONSnoXoGh3IFxLw0zfvzpxR4="},"path_md5":"cfaa08eb55b8fb4b91a8e1ffc96615b6"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

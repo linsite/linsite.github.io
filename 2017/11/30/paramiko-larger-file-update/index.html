@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.tkfun.site","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="介绍Paramiko是Python中用来实现SSH远程登录的模块.Github仓库地址为https:&#x2F;&#x2F;github.com&#x2F;paramiko&#x2F;paramiko,很多时候，运维人员需要远程登录Linux主机，执行一些Bash命令，对系统进行维护。当主机数量少时，这样是可行的，但如果主机数量多达上百台，这样的手工操作显然有点不合适。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Paramiko模块大文件上传慢解决方法">
+<meta property="og:url" content="https://blog.tkfun.site/2017/11/30/paramiko-larger-file-update/index.html">
+<meta property="og:site_name" content="LinLin&#39;s blog">
+<meta property="og:description" content="介绍Paramiko是Python中用来实现SSH远程登录的模块.Github仓库地址为https:&#x2F;&#x2F;github.com&#x2F;paramiko&#x2F;paramiko,很多时候，运维人员需要远程登录Linux主机，执行一些Bash命令，对系统进行维护。当主机数量少时，这样是可行的，但如果主机数量多达上百台，这样的手工操作显然有点不合适。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-11-30T06:36:44.000Z">
+<meta property="article:modified_time" content="2024-11-15T11:58:41.867Z">
+<meta property="article:author" content="LinLin">
+<meta property="article:tag" content="编程学习">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Paramiko">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://blog.tkfun.site/2017/11/30/paramiko-larger-file-update/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.tkfun.site/2017/11/30/paramiko-larger-file-update/","path":"2017/11/30/paramiko-larger-file-update/","title":"Paramiko模块大文件上传慢解决方法"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Paramiko模块大文件上传慢解决方法 | LinLin's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">LinLin's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">如何解决？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LinLin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2017/11/30/paramiko-larger-file-update/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LinLin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Paramiko模块大文件上传慢解决方法 | LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Paramiko模块大文件上传慢解决方法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-11-30 14:36:44" itemprop="dateCreated datePublished" datetime="2017-11-30T14:36:44+08:00">2017-11-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 19:58:41" itemprop="dateModified" datetime="2024-11-15T19:58:41+08:00">2024-11-15</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>Paramiko是Python中用来实现SSH远程登录的模块.Github仓库地址为<a target="_blank" rel="noopener" href="https://github.com/paramiko/paramiko">https://github.com/paramiko/paramiko</a>,很多时候，运维人员需要远程登录Linux主机，执行一些Bash命令，对系统进行维护。当主机数量少时，这样是可行的，但如果主机数量多达上百台，这样的手工操作显然有点不合适。</p>
+<span id="more"></span>
+<p>这时候Paramiko模块就显示出它的威力了。最近做项目就有这样的一个场景，需要将一个很大的文件上传到远程的服务器上，但通过Paramiko的Sftp模块上传时，上传速度超级慢。大概只有1M&#x2F;s左右。而同样的主机上，使用Xftp或者WinWCP上传的速度可以达到30M&#x2F;s。</p>
+<h1 id="如何解决？"><a href="#如何解决？" class="headerlink" title="如何解决？"></a>如何解决？</h1><p>首先还是上百度搜索，搜来搜去网上千篇一律地再介绍Paramiko怎么入坑？只有一个小哥在Chinaunix上问<a target="_blank" rel="noopener" href="http://bbs.chinaunix.net/thread-4184699-1-1.html">链接</a>，然而并没有人回答他。这让我很忧伤，本来就是用Python的人，我决定去看下源码。我上传文件时用的代码是这样的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sftp = ssh.open_sftp()</span><br><span class="line">sftp.put(local_file, remote_file, callback = upload_callback)</span><br></pre></td></tr></table></figure>
+<p>也就是我使用的是Paramiko里面的sftp对象。在Paramiko的源码中简单看了下，就找到了sftp_client.py文件。进去看下，找到了put函数的定义。<br>函数很简单，获取了要上传文件的大小后，就调用putfo的函数去了。而putfo函数最后是调用了_transfer_with_callback函数，到这个函数以后就看明白了。核心代码是一个循环，后面的代码已经不用看了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">size = 0</span><br><span class="line">while True:</span><br><span class="line">    data = reader.read(32768)</span><br><span class="line">    writer.write(data)</span><br><span class="line">    size += len(data)</span><br><span class="line">    if len(data) == 0:</span><br><span class="line">        break</span><br><span class="line">    if callback is not None:</span><br><span class="line">        callback(size, file_size)</span><br></pre></td></tr></table></figure>
+<p>很简单，一次从本地文件中读32768，这个单位你没有看错，是32768字节，也就是32Kb，一次读的内容太少了吧。本来Python运行效率就低，这样反复的IO读写操作，怎么能不慢。于是乎，我就加了个判断逻辑，一次如果文件大小大于10M，就一次读1M数据。<br>修改完成之后，上传速度就立马达到20M&#x2F;s了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>遇到问题，先上网搜索，如果别人有解决方案，直接拿来用，这样的成本最低。</li>
+<li>如果没有人有方案，那么自己尝试看下源码，或许小修改下代码就能为我所用了呢！</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" rel="tag"># 编程学习</a>
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/Paramiko/" rel="tag"># Paramiko</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/10/01/java-reflection-learn-md/" rel="prev" title="Java反射机制学习">
+                  <i class="fa fa-angle-left"></i> Java反射机制学习
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/12/13/phantomjs-sso-login/" rel="next" title="PhantomJS SSO单点登录，加Cookie异常情况处理">
+                  PhantomJS SSO单点登录，加Cookie异常情况处理 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">LinLin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"linsite","repo":"blog","client_id":"c890ddee7bf63b258874","client_secret":"0569d1d63cbc2d139920a15bc963f2ec46371e22","admin_user":"linsite","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","id":"location.pathname","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.js","integrity":"sha256-MVK9MGD/XJaGyIghSVrONSnoXoGh3IFxLw0zfvzpxR4="},"path_md5":"b099ff82940d08b14f7bd52e48563e85"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.tkfun.site","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="k8s APIServer 的相关选项总结。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="k8s-apiserver调优">
+<meta property="og:url" content="https://blog.tkfun.site/2022/05/11/2022-05-apiserver-opt/index.html">
+<meta property="og:site_name" content="LinLin&#39;s blog">
+<meta property="og:description" content="k8s APIServer 的相关选项总结。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-11T14:32:05.000Z">
+<meta property="article:modified_time" content="2024-11-15T11:58:41.867Z">
+<meta property="article:author" content="LinLin">
+<meta property="article:tag" content="k8s">
+<meta property="article:tag" content="apiserver">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://blog.tkfun.site/2022/05/11/2022-05-apiserver-opt/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.tkfun.site/2022/05/11/2022-05-apiserver-opt/","path":"2022/05/11/2022-05-apiserver-opt/","title":"k8s-apiserver调优"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>k8s-apiserver调优 | LinLin's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">LinLin's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-%E9%80%89%E9%A1%B9"><span class="nav-number">1.</span> <span class="nav-text">0x01 选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-%E8%AF%A6%E7%BB%86%E5%90%84%E9%83%A8%E5%88%86%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">0x02 详细各部分配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E9%80%9A%E7%94%A8%E9%85%8D%E7%BD%AE"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 通用配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Etcd%E7%9B%B8%E5%85%B3%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Etcd相关的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%97%A5%E5%BF%97"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E6%9D%82%E9%A1%B9"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 杂项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-%E5%B0%8F%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">0x03 小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LinLin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2022/05/11/2022-05-apiserver-opt/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LinLin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="k8s-apiserver调优 | LinLin's blog">
+      <meta itemprop="description" content="k8s APIServer 的相关选项总结。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          k8s-apiserver调优
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-05-11 22:32:05" itemprop="dateCreated datePublished" datetime="2022-05-11T22:32:05+08:00">2022-05-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 19:58:41" itemprop="dateModified" datetime="2024-11-15T19:58:41+08:00">2024-11-15</time>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">k8s APIServer 的相关选项总结。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>apiserver设计比较复杂，直接去看源码效果较差。尝试从特性角度梳理其设计背后的考量。</p>
+<p>了解一个服务最好的入口就是看它的选项。选的版本是v1.21.5。</p>
+<h2 id="0x01-选项"><a href="#0x01-选项" class="headerlink" title="0x01 选项"></a>0x01 选项</h2><p>选项分为如下几类：</p>
+<ol>
+<li>通用标志(Generic flags) *</li>
+<li>与Etcd相关的配置 *</li>
+<li>安全配置</li>
+<li>审计配置</li>
+<li>特性配置</li>
+<li>认证配置</li>
+<li>授权配置</li>
+<li>云提供商配置</li>
+<li>API开关配置</li>
+<li>网络出口配置</li>
+<li>准入配置</li>
+<li>metrics配置，用于监控</li>
+<li>日志配置 *</li>
+<li>其他杂项配置 *</li>
+</ol>
+<p>加<code>*</code>的为影响性能的参数。为重点学习项。</p>
+<h2 id="0x02-详细各部分配置"><a href="#0x02-详细各部分配置" class="headerlink" title="0x02 详细各部分配置"></a>0x02 详细各部分配置</h2><h3 id="2-1-通用配置"><a href="#2-1-通用配置" class="headerlink" title="2.1 通用配置"></a>2.1 通用配置</h3><p>看下顶级社区项目是如何考虑性能和可靠性的。整体感觉是非常灵活，把决定权交给使用者。</p>
+<p><code>--goaway-chance</code><br>一定机率，随机关掉一个客户端的连接，防止其卡死，强制重连。不影响正常执行的客户端连接。当然这会牺牲一定的性能。</p>
+<span id="more"></span>
+
+<p><code>--max-mutating-requests-inflight</code><br>同一时刻修改类的请求数量上限。限流熔断机制，防止大量请求把服务打跨，设计上可以借鉴下其实现。<br><code>--max-requests-inflight</code><br>同一时刻非修改类请求数量上限。同上。<br><code>--livez-grace-period</code><br>从服务启动到<code>livez</code>正常的时间。超出后，认为那些post start Hook不影响apiserver的功能。<br><code>--min-request-timeout</code><br>最小请求超时时间，watch请求连接适用。<br><code>--request-timeout</code><br>服务商认定的请求超时时间。<br><code>--shutdown-delay-duration</code><br>优雅退出时的延迟时间。这段时间里，通过设置<code>/readyz</code>返回<code>false</code>不再从LB接收新请求，同时<code>/healthz</code>和<code>/livez</code>正常返回，防止被kubelet杀死。已经在处理的请求，还正常完成。<br><code>--feature-gates</code><br>开关特性，默认会开启很多特性。特性越多，资源消耗（计算、内存）就越多，可以适当关闭不需要的特性。</p>
+<h3 id="2-2-Etcd相关的配置"><a href="#2-2-Etcd相关的配置" class="headerlink" title="2.2 Etcd相关的配置"></a>2.2 Etcd相关的配置</h3><p>apiserver是整个系统的核心，所有的其他组件都在与其通信。很容易成为性能的瓶颈点。通过Etcd配置看如何调优，需要使用者在资源使用和性能两者之间抉择。</p>
+<p><code>--default-watch-cache-size</code><br>监听缓存数量，默认是100。某些场景性能不是关键考虑点时，可以设置为0禁掉。</p>
+<p><code>--delete-collection-workers</code><br>清理worker数量。同样，为减少消耗，不关注清理速度时，默认的1即可。</p>
+<p><code>--enable-garbage-collector</code><br>开启GC，用来清理没有关联的孤立资源，不是Go的GC。默认是开启的，不开启需要确认是真的不需要了。</p>
+<p><code>--etcd-db-metric-poll-interval</code><br>etcd监控选项，有别的监控手段时，也可以关闭。</p>
+<p><code>--etcd-compaction-interval</code><br>压缩间隔。可以节省磁盘空间，但会占用一定的CPU。需要考虑选择合适的数值。</p>
+<p><code>--etcd-healthcheck-timeout</code><br>健康检查。不敏感时，可适当调大一些，默认为2秒。</p>
+<p><code>--lease-reuse-duration-seconds</code><br>lease的重用间隔，本身是为用于节省lease资源。默认60，太小会影响性能，太大会造成个对象共用一个lease，两者失效相互干扰。</p>
+<p><code>--storage-media-type</code><br>存储的类型，默认是protobuf，紧凑型的，更高效。不需要修改。</p>
+<p><code>--watch-cache</code><br>开启watch缓存。性能不关心，但在意内存使用量时，可以关闭。</p>
+<p><code>--watch-cache-sizes</code><br>指定不同资源的watch缓存数量。</p>
+<h3 id="2-3-日志"><a href="#2-3-日志" class="headerlink" title="2.3 日志"></a>2.3 日志</h3><p><code>--experimental-logging-sanitization</code><br>日志脱敏，过滤掉密码、serect等敏感信息。会耗费一定的计算，某认关闭。</p>
+<p><code>--logging-format</code><br>日志格式。默认为string。个人理解如果设置为json时，相对string格式json的序列化会有额外的计算消耗。</p>
+<h3 id="2-4-杂项"><a href="#2-4-杂项" class="headerlink" title="2.4 杂项"></a>2.4 杂项</h3><p><code>--event-ttl</code><br>事件保留的时间。默认为1h，k8s运行过程中，产生许多事件，事件的保存会消耗一定的内存资源，可以根据需要调节。</p>
+<p><code>--identity-lease-renew-interval-seconds</code><br>更新自己的lease的周期。对性能有一定影响，太高会对etcd造成压力。</p>
+<p><code>--max-connection-bytes-per-sec</code><br>限制长连接的流量，会影响性能，但可以保证整体的可用性。默认不限制。</p>
+<h2 id="0x03-小结"><a href="#0x03-小结" class="headerlink" title="0x03 小结"></a>0x03 小结</h2><p>顶级开源项目要考虑各种使用场景，不能给出普适的模型，如资源消耗与性能的平衡。所以尽可能各方面都可配置，让使用者自己去选择（trade-off）。了解这些参数，对apiserver调优有一定的参考意义。同时可借鉴其设计上的优点，如优雅退出；如某个参数可能影响影响性能，就提供一个配置项。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/k8s/" rel="tag"># k8s</a>
+              <a href="/tags/apiserver/" rel="tag"># apiserver</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/04/11/2022-04-11-play-with-tn3399/" rel="prev" title="TN3399开发板折腾记录">
+                  <i class="fa fa-angle-left"></i> TN3399开发板折腾记录
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/01/29/2023-01-raspberry/" rel="next" title="树莓派折腾记录">
+                  树莓派折腾记录 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">LinLin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"linsite","repo":"blog","client_id":"c890ddee7bf63b258874","client_secret":"0569d1d63cbc2d139920a15bc963f2ec46371e22","admin_user":"linsite","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","id":"location.pathname","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.js","integrity":"sha256-MVK9MGD/XJaGyIghSVrONSnoXoGh3IFxLw0zfvzpxR4="},"path_md5":"5da93eeb5d69d0c7c11b6852edbd5046"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

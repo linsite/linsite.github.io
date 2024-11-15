@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.tkfun.site","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="LVS配置命令理解1上周末对照着Ubuntu LVS配置 的教程初步熟悉了ubuntu下LVS的配置过程中。这对于想掌握其原理的人来说是不够的。配置的命令有以下几条： ifconfig来为当前的网卡配置虚拟IP。其中同样通过在CSDN上搜索，可以知道，通过在eth0（网卡接口名称）后加“:n”，其中n为N+（正整数），就可以为网卡配置多个虚拟IP地址。这样的IP地址是不会有真实的数据经过它。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LVS配置命令理解1">
+<meta property="og:url" content="https://blog.tkfun.site/2017/02/13/ipvs/index.html">
+<meta property="og:site_name" content="LinLin&#39;s blog">
+<meta property="og:description" content="LVS配置命令理解1上周末对照着Ubuntu LVS配置 的教程初步熟悉了ubuntu下LVS的配置过程中。这对于想掌握其原理的人来说是不够的。配置的命令有以下几条： ifconfig来为当前的网卡配置虚拟IP。其中同样通过在CSDN上搜索，可以知道，通过在eth0（网卡接口名称）后加“:n”，其中n为N+（正整数），就可以为网卡配置多个虚拟IP地址。这样的IP地址是不会有真实的数据经过它。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-02-13T14:52:10.000Z">
+<meta property="article:modified_time" content="2024-11-15T11:58:41.867Z">
+<meta property="article:author" content="LinLin">
+<meta property="article:tag" content="LVS">
+<meta property="article:tag" content="服务器配置">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://blog.tkfun.site/2017/02/13/ipvs/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.tkfun.site/2017/02/13/ipvs/","path":"2017/02/13/ipvs/","title":"LVS配置命令理解1"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LVS配置命令理解1 | LinLin's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">LinLin's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#LVS%E9%85%8D%E7%BD%AE%E5%91%BD%E4%BB%A4%E7%90%86%E8%A7%A31"><span class="nav-number">1.</span> <span class="nav-text">LVS配置命令理解1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ifconfig%E6%9D%A5%E4%B8%BA%E5%BD%93%E5%89%8D%E7%9A%84%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E8%99%9A%E6%8B%9FIP%E3%80%82"><span class="nav-number">1.1.</span> <span class="nav-text">ifconfig来为当前的网卡配置虚拟IP。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8IP%E5%8C%85%E8%BD%AC%E5%8F%91%E5%8A%9F%E8%83%BD"><span class="nav-number">1.2.</span> <span class="nav-text">启动IP包转发功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%9B%B4%E6%8E%A5%E5%9C%A8%E6%96%87%E4%BB%B6%E4%B8%AD%E5%86%99%E5%85%A51"><span class="nav-number">1.2.1.</span> <span class="nav-text">1. 直接在文件中写入1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E9%80%9A%E8%BF%87sysctl%E5%91%BD%E4%BB%A4%E6%9D%A5%E4%BF%AE%E6%94%B9"><span class="nav-number">1.2.2.</span> <span class="nav-text">2. 通过sysctl命令来修改</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LinLin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2017/02/13/ipvs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LinLin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LVS配置命令理解1 | LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LVS配置命令理解1
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-02-13 22:52:10" itemprop="dateCreated datePublished" datetime="2017-02-13T22:52:10+08:00">2017-02-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 19:58:41" itemprop="dateModified" datetime="2024-11-15T19:58:41+08:00">2024-11-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/" itemprop="url" rel="index"><span itemprop="name">系统运维</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="LVS配置命令理解1"><a href="#LVS配置命令理解1" class="headerlink" title="LVS配置命令理解1"></a>LVS配置命令理解1</h1><p>上周末对照着<a target="_blank" rel="noopener" href="http://blog.csdn.net/lihancheng/article/details/47152499">Ubuntu LVS配置 </a>的教程初步熟悉了ubuntu下LVS的配置过程中。这对于想掌握其原理的人来说是不够的。<br>配置的命令有以下几条：</p>
+<h2 id="ifconfig来为当前的网卡配置虚拟IP。"><a href="#ifconfig来为当前的网卡配置虚拟IP。" class="headerlink" title="ifconfig来为当前的网卡配置虚拟IP。"></a>ifconfig来为当前的网卡配置虚拟IP。</h2><p>其中同样通过在CSDN上搜索，可以知道，通过在eth0（网卡接口名称）后加“:n”，其中n为N+（正整数），就可以为网卡配置多个虚拟IP地址。这样的IP地址是不会有真实的数据经过它。</p>
+<span id="more"></span>
+<p>比如我的电脑上只有一个无线网卡，用ifconfig命令得到的回显中，显示名称是wlps1s0。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">lin@lin-pc2:~/Documents/ops$ ifconfig</span><br><span class="line">lo        Link encap:Local Loopback  </span><br><span class="line">          inet addr:127.0.0.1  Mask:255.0.0.0</span><br><span class="line">          inet6 addr: ::1/128 Scope:Host</span><br><span class="line">          UP LOOPBACK RUNNING  MTU:65536  Metric:1</span><br><span class="line">          RX packets:614 errors:0 dropped:0 overruns:0 frame:0</span><br><span class="line">          TX packets:614 errors:0 dropped:0 overruns:0 carrier:0</span><br><span class="line">          collisions:0 txqueuelen:1</span><br><span class="line">          RX bytes:57615 (57.6 KB)  TX bytes:57615 (57.6 KB)</span><br><span class="line"></span><br><span class="line">wlp1s0    Link encap:Ethernet  HWaddr d0:57:7b:b0:a1:d0  </span><br><span class="line">          inet addr:192.168.31.172  Bcast:192.168.31.255  Mask:255.255.255.0</span><br><span class="line">          inet6 addr: fe80::2805:4caf:e64f:ff0d/64 Scope:Link</span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1</span><br><span class="line">          RX packets:2241 errors:0 dropped:0 overruns:0 frame:0</span><br><span class="line">          TX packets:1901 errors:0 dropped:0 overruns:0 carrier:0</span><br><span class="line">          collisions:0 txqueuelen:1000</span><br><span class="line">          RX bytes:1512337 (1.5 MB)  TX bytes:394920 (394.9 KB)</span><br></pre></td></tr></table></figure>
+<p>其中lo为本地的回环接口。LVS配置过程中也要使用这个接口。可以得到我的局域网IP网络号为192.168.31.x。那么如下的命令可以为我的无线网卡添加一个虚拟IP。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lin@lin-pc2:~/Documents/ops$ sudo ifconfig wlp1s0:1 192.168.31.173 netmask 255.255.255.0</span><br></pre></td></tr></table></figure>
+<p>再次使用ifconfig命令得到的回显为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">lin@lin-pc2:~/Documents/ops$ ifconfig</span><br><span class="line">lo        Link encap:Local Loopback  </span><br><span class="line">          inet addr:127.0.0.1  Mask:255.0.0.0</span><br><span class="line">          inet6 addr: ::1/128 Scope:Host</span><br><span class="line">          UP LOOPBACK RUNNING  MTU:65536  Metric:1</span><br><span class="line">          RX packets:672 errors:0 dropped:0 overruns:0 frame:0</span><br><span class="line">          TX packets:672 errors:0 dropped:0 overruns:0 carrier:0</span><br><span class="line">          collisions:0 txqueuelen:1</span><br><span class="line">          RX bytes:65106 (65.1 KB)  TX bytes:65106 (65.1 KB)</span><br><span class="line"></span><br><span class="line">wlp1s0    Link encap:Ethernet  HWaddr d0:57:7b:b0:a1:d0  </span><br><span class="line">          inet addr:192.168.31.172  Bcast:192.168.31.255  Mask:255.255.255.0</span><br><span class="line">          inet6 addr: fe80::2805:4caf:e64f:ff0d/64 Scope:Link</span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1</span><br><span class="line">          RX packets:3001 errors:0 dropped:0 overruns:0 frame:0</span><br><span class="line">          TX packets:2249 errors:0 dropped:0 overruns:0 carrier:0</span><br><span class="line">          collisions:0 txqueuelen:1000</span><br><span class="line">          RX bytes:2382550 (2.3 MB)  TX bytes:459282 (459.2 KB)</span><br><span class="line"></span><br><span class="line">wlp1s0:1  Link encap:Ethernet  HWaddr d0:57:7b:b0:a1:d0  </span><br><span class="line">          inet addr:192.168.31.173  Bcast:192.168.31.255  Mask:255.255.255.0</span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>可以看到已经新增了一个虚拟IP。可以注意到这个虚拟IP对应的接口，没有显示接收，发送的数据包信息，却可以在局域网中ping通这个IP地址。原因是，它只是一个虚拟的，真正的数据包还是经过wlp1s0这个接口发送和接收的。</p>
+<h2 id="启动IP包转发功能"><a href="#启动IP包转发功能" class="headerlink" title="启动IP包转发功能"></a>启动IP包转发功能</h2><p>ubuntu内核中默认是不支持IP包转发的。因为ubuntu是作为终端操作系统来运行的，IP包转发是路由器的功能。然而，强大的内核可配置性，允许我们改变这样的默认设置，使它支持包转发。这也是为什么，ubuntu操作系统中支持wifi热点搭建的原因。控制这个选项的变量是在&#x2F;proc&#x2F;sys&#x2F;net&#x2F;ipv4&#x2F;ip_forward文件中写着的。启动的方法有两种。</p>
+<h3 id="1-直接在文件中写入1"><a href="#1-直接在文件中写入1" class="headerlink" title="1. 直接在文件中写入1"></a>1. 直接在文件中写入1</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#echo &quot;1&quot; /proc/sys/net/ipv4/ip_forward</span><br></pre></td></tr></table></figure>
+<p>命令前面的#表示这个命令是需要有root权限的。</p>
+<h3 id="2-通过sysctl命令来修改"><a href="#2-通过sysctl命令来修改" class="headerlink" title="2. 通过sysctl命令来修改"></a>2. 通过sysctl命令来修改</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#sysctl net.ipv4.ip_forward=1</span><br></pre></td></tr></table></figure>
+<p>同样需要root权限，都能达到目的。sysctl是一个非常有用的在内核运行时改变内核参数的工具。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LVS/" rel="tag"># LVS</a>
+              <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" rel="tag"># 服务器配置</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/12/22/crc-algo-trans7-note/" rel="prev" title="轻松理解CRC差错检测算法七-注解">
+                  <i class="fa fa-angle-left"></i> 轻松理解CRC差错检测算法七-注解
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/03/03/max-symmetry-substring/" rel="next" title="求最长子对称字符串算法">
+                  求最长子对称字符串算法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">LinLin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"linsite","repo":"blog","client_id":"c890ddee7bf63b258874","client_secret":"0569d1d63cbc2d139920a15bc963f2ec46371e22","admin_user":"linsite","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","id":"location.pathname","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.js","integrity":"sha256-MVK9MGD/XJaGyIghSVrONSnoXoGh3IFxLw0zfvzpxR4="},"path_md5":"0ff5faf32cf01fa8a8d5f7a7ed9e4326"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>
