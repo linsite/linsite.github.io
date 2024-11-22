@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.tkfun.site","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="记录 TN3399 开发板折腾过程踩的坑。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TN3399开发板折腾记录">
+<meta property="og:url" content="https://blog.tkfun.site/2022/04/11/2022-04-11-play-with-tn3399/index.html">
+<meta property="og:site_name" content="LinLin&#39;s blog">
+<meta property="og:description" content="记录 TN3399 开发板折腾过程踩的坑。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-04-11T13:05:03.000Z">
+<meta property="article:modified_time" content="2024-11-15T11:58:41.867Z">
+<meta property="article:author" content="LinLin">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Arm开发板">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://blog.tkfun.site/2022/04/11/2022-04-11-play-with-tn3399/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.tkfun.site/2022/04/11/2022-04-11-play-with-tn3399/","path":"2022/04/11/2022-04-11-play-with-tn3399/","title":"TN3399开发板折腾记录"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>TN3399开发板折腾记录 | LinLin's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">LinLin's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">0x01 背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-%E6%8D%A2%E5%86%85%E6%A0%B8"><span class="nav-number">2.</span> <span class="nav-text">0x02 换内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-Wifi%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">0x03 Wifi问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-%E6%9B%B4%E6%96%B0%E5%86%85%E6%A0%B8"><span class="nav-number">4.</span> <span class="nav-text">0x04 更新内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-%E5%B0%8F%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">0x05 小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06-%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">0x06 参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LinLin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2022/04/11/2022-04-11-play-with-tn3399/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LinLin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="TN3399开发板折腾记录 | LinLin's blog">
+      <meta itemprop="description" content="记录 TN3399 开发板折腾过程踩的坑。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TN3399开发板折腾记录
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-04-11 21:05:03" itemprop="dateCreated datePublished" datetime="2022-04-11T21:05:03+08:00">2022-04-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 19:58:41" itemprop="dateModified" datetime="2024-11-15T19:58:41+08:00">2024-11-15</time>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">记录 TN3399 开发板折腾过程踩的坑。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="0x01-背景"><a href="#0x01-背景" class="headerlink" title="0x01 背景"></a>0x01 背景</h2><p>需要一个能支持GICv3的设备。春节时，在安卓旧手机上折腾了一圈，买了2个旧手机（红米2、1加3T），都不行。</p>
+<ul>
+<li>红米2，可以通过开源的hyp固件[<a target="_blank" rel="noopener" href="https://github.com/msm8916-mainline/qhypstub/issues]%EF%BC%8C%E5%AE%9E%E7%8E%B0KVM%E3%80%82%E4%BD%86%E6%98%AF%E5%AF%B9%E5%BA%94%E7%9A%84%E8%8A%AF%E7%89%87%E6%98%AFMSM8916%E7%9A%84%EF%BC%8C%E5%8F%AA%E6%94%AF%E6%8C%81GICv2%E3%80%82">https://github.com/msm8916-mainline/qhypstub/issues]，实现KVM。但是对应的芯片是MSM8916的，只支持GICv2。</a></li>
+<li>1加3T，芯片MSM8996是支持GICv3的。但是对应的hyp固件相关信息没有开源，所以无法支持虚拟机。</li>
+</ul>
+<ol>
+<li>板子是在闲鱼上买的。300块，包邮。</li>
+<li>到手后发现内核版本是4.7的Armbian。不是我需要的5.x的。</li>
+</ol>
+<p>所以就开始折腾了。记录下折腾的过程，希望能帮到各位同学。</p>
+<span id="more"></span>
+
+<p>以下操作过程中最好有个显示器或者串口设备，看不到输出的话，折腾效率很低。</p>
+<h2 id="0x02-换内核"><a href="#0x02-换内核" class="headerlink" title="0x02 换内核"></a>0x02 换内核</h2><p>内核在<a target="_blank" rel="noopener" href="https://github.com/lanseyujie/tn3399_v3/">https://github.com/lanseyujie/tn3399_v3&#x2F;</a>。<br>直接使用编译好的。按照板子的刷机流程，刷好了之后发现Wifi网络不稳定。</p>
+<p>详细教程在这个论坛中也有<a target="_blank" rel="noopener" href="https://www.right.com.cn/forum/thread-4033942-1-1.html">https://www.right.com.cn/forum/thread-4033942-1-1.html</a>。</p>
+<h2 id="0x03-Wifi问题"><a href="#0x03-Wifi问题" class="headerlink" title="0x03 Wifi问题"></a>0x03 Wifi问题</h2><p>具体表现是，在同网段的其他主机去ping它。出现超高延迟，达到200ms，还会丢包。</p>
+<p>开始以为网卡的天线太小了。买了外置天线，接上也不行。开始怀疑是网卡的问题。</p>
+<ol>
+<li>下载5.8.1的内核</li>
+<li>准备内核编译环境</li>
+<li>配置内核<br>具体的配置过程，网上有教程。我使用的USB无线网卡是Realtek 8188CUS型号的。使用的内核中没有默认编译支持。需要自己开启。需要打开<code>CONFIG_RTL8XXXU_UNTESTED=y</code>选项。</li>
+</ol>
+<p>在内核目录下，通过<code>make M=drivers/net/wireless/realtek/rtl8xxxu modules</code>，编译需要的驱动目录。</p>
+<p>最终编译好了，加载驱动时，提示没有固件。从这里找到了固件，下载安装好。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://ftp.de.debian.org/debian/pool/non-free/f/firmware-nonfree/firmware-realtek_20190114-2_all.deb</span><br></pre></td></tr></table></figure>
+
+<p>都安装好了。设备probe异常。提示如下错误：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Failed to write block at addr: 1080 size: 0080 </span><br></pre></td></tr></table></figure>
+
+<p>后来发现是插的USB口不对。它不支持USB3，换了USB2的口就可以了。</p>
+<p>更换之后，网络就非常稳定了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">--- 192.168.31.111 ping statistics ---</span><br><span class="line">10 packets transmitted, 10 packets received, 0.0% packet loss</span><br><span class="line">round-trip min/avg/max/stddev = 1.546/4.366/8.557/2.348 ms</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x04-更新内核"><a href="#0x04-更新内核" class="headerlink" title="0x04 更新内核"></a>0x04 更新内核</h2><p>默认的内核选项有一些不满足需求。经过修改后，更新到&#x2F;boot下。在&#x2F;boot&#x2F;extlinux&#x2F;extlinux.conf中添加一个启动项即可。Image和dtb可以从新编译出的内核目录拷出，github上有说明。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">default kernel-5.8.1</span><br><span class="line">timeout 10</span><br><span class="line">prompt 0</span><br><span class="line"></span><br><span class="line">label kernel-5.8.1</span><br><span class="line">    kernel /Image.new</span><br><span class="line">    fdt /tn3399-linux-new.dtb</span><br><span class="line">    append earlycon=uart8250,mmio32,0xff1a0000 swiotlb=1 coherent_pool=1m earlyprintk console=ttyS2,1500000n8 rw root=PARTUUID=b921b045-1d rootfstype=ext4 init=/sbin/init rootwait</span><br><span class="line">label kernel-5.8</span><br><span class="line">    kernel /Image</span><br><span class="line">    fdt /tn3399-linux.dtb</span><br><span class="line">    append earlycon=uart8250,mmio32,0xff1a0000 swiotlb=1 coherent_pool=1m earlyprintk console=ttyS2,1500000n8 rw root=PARTUUID=b921b045-1d rootfstype=ext4 init=/sbin/init rootwait</span><br></pre></td></tr></table></figure>
+<p> 反正我是更新了内核之后，可以在上面跑k8s的。这样直接操作是有点风险的，准备好重新刷系统。我是把内核的目标挂载在另外一个SD卡中，重新刷系统后，更新内核还算比较快。</p>
+<h2 id="0x05-小结"><a href="#0x05-小结" class="headerlink" title="0x05 小结"></a>0x05 小结</h2><p>只能说ARM开发板折腾是需要点基础和毅力的，USB网卡驱动死活加载不成功时，都 一度想放弃了。</p>
+<h2 id="0x06-参考"><a href="#0x06-参考" class="headerlink" title="0x06 参考"></a>0x06 参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://www.right.com.cn/forum/thread-4033942-1-1.html">恩山无线论坛帖子 https://www.right.com.cn/forum/thread-4033942-1-1.htm</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/lanseyujie/tn3399_v3/">github上的内核 https://github.com/lanseyujie/tn3399_v3&#x2F;</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Arm%E5%BC%80%E5%8F%91%E6%9D%BF/" rel="tag"># Arm开发板</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/04/08/2022-04-08-go-chan-nonblock/" rel="prev" title="Go非阻塞通道探究">
+                  <i class="fa fa-angle-left"></i> Go非阻塞通道探究
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/05/11/2022-05-apiserver-opt/" rel="next" title="k8s-apiserver调优">
+                  k8s-apiserver调优 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">LinLin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"linsite","repo":"blog","client_id":"c890ddee7bf63b258874","client_secret":"0569d1d63cbc2d139920a15bc963f2ec46371e22","admin_user":"linsite","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","id":"location.pathname","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.js","integrity":"sha256-MVK9MGD/XJaGyIghSVrONSnoXoGh3IFxLw0zfvzpxR4="},"path_md5":"ed6529f76504c14f569c1b98d16996db"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

